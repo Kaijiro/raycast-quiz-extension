@@ -41,3 +41,12 @@ export async function storeQuiz(quiz: Quiz): Promise<void> {
   else index.push(item);
   await setQuizzesIndex(index);
 }
+
+export async function deleteQuiz(quizId: string): Promise<void> {
+  // remove quiz and its progress, and update index
+  await LocalStorage.removeItem(`quiz:${quizId}`);
+  await LocalStorage.removeItem(`progress:${quizId}`);
+  const index = await getQuizzesIndex();
+  const next = index.filter((i) => i.quizId !== quizId);
+  await setQuizzesIndex(next);
+}
