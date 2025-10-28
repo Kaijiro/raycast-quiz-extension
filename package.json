@@ -6,16 +6,29 @@
   "icon": "extension-icon.png",
   "author": "Kaijiro <https://github.com/Kaijiro>",
   "platforms": [
-    "macOS",
-    "Windows"
+    "macOS"
   ],
   "license": "MIT",
   "commands": [
     {
+      "name": "import-quiz",
+      "title": "Import Quiz",
+      "description": "Import a quiz from a JSON file",
+      "mode": "no-view"
+    },
+    {
       "name": "start-quiz",
       "title": "Start Quiz",
       "description": "",
-      "mode": "no-view"
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "quizId",
+          "placeholder": "Quiz ID",
+          "type": "text",
+          "optional": true
+        }
+      ]
     }
   ],
   "dependencies": {
@@ -28,13 +41,16 @@
     "@types/react": "19.0.10",
     "eslint": "^9.22.0",
     "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^2.1.3"
   },
   "scripts": {
     "build": "ray build",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "echo 'Publishing to npm is disabled. Use yarn publish to publish to the Raycast Store.' && exit 1",
     "publish": "yarn dlx @raycast/api@latest publish"
   }
