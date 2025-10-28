@@ -1,5 +1,8 @@
-import { Detail, LocalStorage } from "@raycast/api";
+import { Action, ActionPanel, Icon, List } from "@raycast/api";
 import { useEffect, useState } from "react";
+import { getQuizzesWithRemainingCounts, resetProgress } from "./utils/gameplay";
+import { deleteQuiz } from "./utils/storage";
+import QuizPlay from "./quiz-play";
 
 type Props = {
   arguments: { quizId?: string };
@@ -7,60 +10,70 @@ type Props = {
 
 export default function StartQuiz(props: Props) {
   const quizId = props.arguments?.quizId;
-  const [title, setTitle] = useState<string>("Starting quiz...");
-  const [markdown, setMarkdown] = useState<string>("Loading quiz...");
+
+  if (quizId) {
+    return <QuizPlay quizId={quizId} />;
+  }
+
+  return <QuizzesList />;
+}
+
+function QuizzesList() {
+  const [items, setItems] = useState<Awaited<ReturnType<typeof getQuizzesWithRemainingCounts>>>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function reload() {
+    setLoading(true);
+    const list = await getQuizzesWithRemainingCounts();
+    // sort by lastUpdated desc
+    list.sort((a, b) => (b.lastUpdatedAt ?? 0) - (a.lastUpdatedAt ?? 0));
+    setItems(list);
+    setLoading(false);
+  }
 
   useEffect(() => {
-    async function load() {
-      if (!quizId) {
-        setTitle("Start Quiz");
-        setMarkdown("No quiz selected. Use Import Quiz to add a quiz.");
-        return;
-      }
-      const raw = await LocalStorage.getItem<string>(`quiz:${quizId}`);
-      if (!raw) {
-        setTitle("Quiz Not Found");
-        setMarkdown(`No quiz found for id: ${quizId}`);
-        return;
-      }
-      try {
-        const quiz = JSON.parse(raw) as { title: string; questions?: { id: string }[] };
-        // Ensure progress exists; if missing or invalid, reseed from quiz
-        const progressKey = `progress:${quizId}`;
-        const progressRaw = await LocalStorage.getItem<string>(progressKey);
-        let reseeded = false;
-        if (!progressRaw) {
-          const remainingQuestions = (quiz.questions ?? []).map((q) => q.id);
-          await LocalStorage.setItem(progressKey, JSON.stringify({ remainingQuestions }));
-          reseeded = true;
-        } else {
-          try {
-            const parsed = JSON.parse(progressRaw) as { remainingQuestions?: string[] };
-            if (!parsed || !Array.isArray(parsed.remainingQuestions)) {
-              const remainingQuestions = (quiz.questions ?? []).map((q) => q.id);
-              await LocalStorage.setItem(progressKey, JSON.stringify({ remainingQuestions }));
-              reseeded = true;
+    reload();
+  }, []);
+
+  return (
+    <List isLoading={loading} searchBarPlaceholder="Search quizzes" searchBarAccessory={undefined}>
+      {items.length === 0 ? (
+        <List.EmptyView
+          title="No quizzes yet"
+          description="Use Import Quiz to add one."
+          icon={Icon.QuestionMarkCircle}
+        />
+      ) : (
+        items.map((q) => (
+          <List.Item
+            key={q.quizId}
+            title={q.title}
+            accessories={[{ tag: `${q.remaining} remaining` }]}
+            actions={
+              <ActionPanel>
+                <Action.Push title="Start" icon={Icon.Play} target={<QuizPlay quizId={q.quizId} />} />
+                <Action
+                  title="Reset Progress"
+                  shortcut={{ modifiers: ["cmd"], key: "r" }}
+                  onAction={async () => {
+                    await resetProgress(q.quizId);
+                    await reload();
+                  }}
+                />
+                <Action
+                  title="Delete Quiz"
+                  style={Action.Style.Destructive}
+                  shortcut={{ modifiers: ["cmd"], key: "backspace" }}
+                  onAction={async () => {
+                    await deleteQuiz(q.quizId);
+                    await reload();
+                  }}
+                />
+              </ActionPanel>
             }
-          } catch {
-            const remainingQuestions = (quiz.questions ?? []).map((q) => q.id);
-            await LocalStorage.setItem(progressKey, JSON.stringify({ remainingQuestions }));
-            reseeded = true;
-          }
-        }
-
-        setTitle(quiz.title);
-        setMarkdown(
-          reseeded
-            ? `Quiz \`${quiz.title}\` ready. Progress was missing/corrupted and has been reset. (Gameplay to be implemented)`
-            : `Quiz \`${quiz.title}\` imported and ready. (Gameplay to be implemented)`
-        );
-      } catch {
-        setTitle("Quiz Error");
-        setMarkdown("Stored quiz is corrupted.");
-      }
-    }
-    load();
-  }, [quizId]);
-
-  return <Detail navigationTitle={title} markdown={markdown} />;
+          />
+        ))
+      )}
+    </List>
+  );
 }
