@@ -37,7 +37,7 @@ The raycast-quiz extension is an extension for Raycast to create some quiz in Ra
 
 1. WHEN a user chooses an answer, either correct or not, THEN the system SHALL display the small explanation of the answer contained in the JSON file.
 
-### Requirement 4
+### Requirement 4 [DONE]
 
 **User Story:** As a user, I want the system to give me feedback if the quiz file is not valid.
 
