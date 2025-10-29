@@ -45,7 +45,7 @@ The raycast-quiz extension is an extension for Raycast to create some quiz in Ra
 
 1. WHEN a user chooses a JSON file, THEN the system SHALL validate the file and displays an error message if the file is not valid.
 
-### Requirement 5
+### Requirement 5 [DONE]
 
 **User Story:** As a quiz creator, I want to create a quiz with multiple-choice questions.
 
