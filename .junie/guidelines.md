@@ -7,24 +7,31 @@ These guidelines define how we work on this repository. They are designed to enf
 - TDD: Write a failing test/spec first, then implement the minimal code to pass it, and finally refactor safely.
 - Yarn-only: Use Yarn for all dependency and script operations. Do not use npm or pnpm. See "Tooling" below.
 
-## Workflow (TDD)
-1. Discover requirement
+## Workflow
+1. Pre-requisites
+   - Checkout on the `main` branch and pull the latest changes.
+   - Create a new branch for your feature or fix with the following naming convention: `feature/<name>` or `fix/<name>`.
+2. Discover requirement
    - Identify the exact acceptance criteria in `specs/features.md` and the relevant constraints in `specs/requirements.md`.
-2. Write/extend tests
+3. Write/extend tests
    - Add or update tests that capture the acceptance criteria and edge cases.
    - Keep tests small, deterministic, and independent.
-3. Run tests to see them fail (red)
+4. Run tests to see them fail (red)
    - Ensure the new/updated tests fail for the right reason.
-4. Implement the minimum code (green)
+5. Implement the minimum code (green)
    - Implement only what’s necessary to pass the failing test(s).
-5. Refactor
-   - Improve code quality while keeping tests green (naming, structure, duplication removal).
-6. Verify behavior end-to-end
-   - Run the extension locally when appropriate and validate against the specs (it may need human intervention).
+6. Refactor
+   - Improve code quality while keeping tests green (naming, structure, duplication removal, import optimization).
+7. After your work is done
+    - Commit your changes with a concise and descriptive commit message.
+    - Mark your task as `[DONE]` in the specs/features.md.
+    - Push your branch to the remote repository.
+    - Open a pull request.
 
 ## Tests
 - Test files must be kept under a dedicated `__tests__` directory. Use `.test.ts`/`.test.tsx` suffix.
 - Prefer testing logic in isolation. For Raycast UI, extract logic into pure functions where possible and test them directly.
+- Tests are run with `yarn test`.
 - Cover:
   - Validation of quiz schema and all rules in `specs/requirements.md`.
   - LocalStorage interactions (quizzes index, quiz content, progress updates, reset behavior).

@@ -6,7 +6,7 @@ The raycast-quiz extension is an extension for Raycast to create some quiz in Ra
 
 ## Requirements
 
-### Requirement 1
+### Requirement 1 [DONE]
 
 **User Story:** As a user, I want to be able to create a quiz in Raycast by selecting a local JSON file containing questions.
 
@@ -16,7 +16,7 @@ The raycast-quiz extension is an extension for Raycast to create some quiz in Ra
 2. WHEN a user chooses a JSON file, THEN the system SHALL validate the file. IF the file is not valid THEN display a Toast error with the first three validation issues. 
 3. WHEN a user chooses a JSON file AND the file is valid THEN the system SHALL register the quiz and start it.
 
-### Requirement 2
+### Requirement 2 [DONE]
 
 **User Story:** As a user, I want to be able to play a quiz in Raycast.
 
@@ -29,7 +29,7 @@ The raycast-quiz extension is an extension for Raycast to create some quiz in Ra
 5. WHEN a user chooses to play another question, THEN the system SHALL display the next random question.
 6. WHEN a user finished a quiz by answering all questions, THEN the system SHALL show a completion view with actions "Restart Quiz" and "Back to Quizzes".
 
-### Requirement 3
+### Requirement 3 [DONE]
 
 **User Story:** As a quiz creator, I want to be able to give some insights on why this answer is correct.
 
