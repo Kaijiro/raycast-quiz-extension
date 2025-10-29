@@ -2,6 +2,7 @@ import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Quiz } from "./utils/validation";
 import { evaluateAnswer, markQuestionPlayed, pickRandomQuestion, resetProgress } from "./utils/gameplay";
+import { buildQuestionMarkdown } from "./utils/markdown";
 
 export default function QuizPlay(props: { quizId: string }) {
   const { quizId } = props;
@@ -99,24 +100,8 @@ export default function QuizPlay(props: { quizId: string }) {
   }
 
   const md = useMemo(() => {
-    if (!quiz || !question) return "Loading...";
-    const typeLabel = question.type === "single-choice" ? "Single Choice" : "Multiple Choice";
-    const lines: string[] = [];
-    lines.push(`# ${quiz.title}`);
-    lines.push("");
-    lines.push(`> ${typeLabel}`);
-    lines.push("");
-    lines.push(`## ${question.question}`);
-    lines.push("");
-    for (const opt of question.options) {
-      const marker = state.kind === "question" && state.selection.includes(opt.key) ? "[x]" : "[ ]";
-      lines.push(`- ${marker} (${opt.key}) ${opt.text}`);
-    }
-    if (state.kind === "question" && state.evaluated) {
-      lines.push("");
-      lines.push(state.correct ? "✅ Correct" : "❌ Incorrect");
-    }
-    return lines.join("\n");
+    const builderState = state.kind === "question" ? state : { kind: "loading" as const };
+    return buildQuestionMarkdown(quiz, question, builderState);
   }, [quiz, question, state]);
 
   const actions = (
